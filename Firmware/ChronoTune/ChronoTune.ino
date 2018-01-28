@@ -32,18 +32,24 @@ Project ChronoTune was developed in collaboration with the Inner Circle of the 6
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
+#include <FlashStorage.h>
+#include "RTClib.h"
 
-Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();  //initialize the display
+//hardware setup
+RTC_DS3231 rtc;                                    //declare the DS3231 RTC
+Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();  //declare the display
 
-char displaybuffer[4] = {' ', ' ', ' ', ' '};  //buffer for marquee messages
+//declare variables
+char displaybuffer[4] = {' ', ' ', ' ', ' '};      //buffer for marquee messages
+
 
 void setup() {
-  Serial.begin(9600);  //open the serial port (for debug only)
+  Serial.begin(9600);     //open the serial port (for debug only)
 
-  alpha4.begin(0x70);  // pass in the address
+  alpha4.begin(0x70);     //display driver is at I2C address 70h
 
   alpha4.clear();         //clear the display
-  alpha4.writeDisplay();  //use this command to update the display
+  alpha4.writeDisplay();  //update the display with new data
 
   //display startup message
   marquee("Project ChronoTune");
@@ -60,8 +66,8 @@ void loop() {
 //  must pass a string; returns nothing
 void marquee(String s)
 {
-  s.concat("    ");  //concatenate 4 blank spaces to  the beginning of the message to make the entire
-                     //message scroll across the display
+  s.concat("    ");     //concatenate 4 blank spaces to  the beginning of the message to make the entire
+                        //message scroll across the display
 
   for (int i=0; i < s.length(); i++){   //run loop i times, where i is the number of characters in the string
 
