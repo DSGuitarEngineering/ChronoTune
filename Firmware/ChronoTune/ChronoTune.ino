@@ -39,9 +39,37 @@ Project ChronoTune was developed in collaboration with the Inner Circle of the 6
 RTC_DS3231 rtc;                                    //declare the DS3231 RTC
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();  //declare the display
 
+//set pin numbers
+const byte FSW = 1;                 //footswitch pin, active low
+const byte SQW = 4;                 //RTC square wave input pin
+
 //declare variables
 char displaybuffer[4] = {' ', ' ', ' ', ' '};      //buffer for marquee messages
 
+boolean buttonDown = false;         //button's current debounced reading
+boolean buttonHeld = false;         //button hold detector
+unsigned long buttonTimer = 0;      //timer for debouncing button
+int debounce = 40UL;                //debounce time in milliseconds
+
+byte SQWstate;                      //stores the state of the SQW pin
+
+byte swHrs = 0;                     //stores the hours value of the stopwatch
+byte swMin = 0;                     //stores the minutes value of the stopwatch
+byte swSec = 0;                     //stores the seconds value of the stopwatch
+boolean runSW = false;              //trigger for incrementing the stopwatch in the main loop
+
+byte ctdnMin;                       //stores the minutes value of the countdown timer (EEPROM)
+byte ctdnSec;                       //stores the seconds value of the countdown timer (EEPROM)
+boolean runTimer = false;           //trigger for decrementing the timer in the main loop
+
+byte clkHour = 0;                   //stores the hour of the current time
+byte clkMin = 0;                    //stores the minute of the current time
+
+byte menu = 0;                      //menu register stores the current position in the menu tree
+boolean setupMode = false;          //specifies whether startup should go to setup mode or normal
+byte warning;                       //temporarily holds the value of the countdown timer warning
+
+boolean drawColon = false;          //lights the colon segments on the display when true
 
 void setup() {
   Serial.begin(9600);     //open the serial port (for debug only)
