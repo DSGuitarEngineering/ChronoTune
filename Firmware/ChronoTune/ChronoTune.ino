@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Version:        0.0.1
-Modified:       January 27, 2018
-Verified:       January 27, 2018
+Version:        0.1.0
+Modified:       February 3, 2018
+Verified:       February 3, 2018
 Target uC:      ATSAMD21G18
 
 -----------------------------------------***DESCRIPTION***------------------------------------------------
@@ -98,8 +98,7 @@ void setup() {
 
 
 void loop() {
-  writeLeft(12);
-  writeRight(34);
+  writeClk();
   delay(250);
 }
 
