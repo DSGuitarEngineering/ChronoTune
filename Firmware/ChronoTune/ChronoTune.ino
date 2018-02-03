@@ -86,9 +86,9 @@ void setup() {
   alpha4.writeDisplay();  //update the display with new data
 
   //display startup message
-  marquee("Project ChronoTune");
-  delay(500);
-  marquee("by DS Engineering");
+  marquee("ChronoTune");
+  //delay(500);
+  //marquee("by DS Engineering");
 }
 
 
@@ -98,7 +98,9 @@ void setup() {
 
 
 void loop() {
-
+  writeLeft(12);
+  writeRight(34);
+  delay(250);
 }
 
 
@@ -107,16 +109,37 @@ void loop() {
 //***********************************************************************************************************************
 
 
+//This routine writes the current time to the display--------------------------------------------------------------
+void writeClk()
+{
+  DateTime now = rtc.now();                     // Get the RTC info
+  clkHour = now.hour();                         // Get the hour
+  /*if(EEPROM.read(2) == 0)
+  {
+    if(clkHour > 12) clkHour -= 12;             // if 12hr format is selected, convert the hours
+    if(clkHour == 0) clkHour = 12;
+  }*/
+  clkMin = now.minute();                        // Get the minutes
+  drawColon = true;
+  //WriteDisp(0x09, 0x0F);                        // Set all digits to "BCD decode".
+  writeLeft(clkHour);
+  writeRight(clkMin);
+}
+
+
 //This routine writes numbers to the left side of the display--------------------------------------------------------
 void writeLeft(byte x)
 {
-  alpha4.writeDigitAscii(1, x / 10);
+  char y = (x / 10) + '0';                      //calculate left digit and convert number to character
+  char z = (x % 10) + '0';                      //calculate right digit and convert number to character
+  alpha4.writeDigitAscii(0, y);                 //write the left number
+  alpha4.writeDigitAscii(1, z);                 //write the right number
 
   /*if the clock is active and in 12 hour format
   if((clkHour < 10) && (menu == 0 || menu == B00010000 || menu == B00100000) && (EEPROM.read(2) == 0))
   {
     WriteDisp(1, 0x0F);           // turn off the first digit if time is less than 10:00
-  }*/
+  }
 
   if(drawColon == false) {alpha4.writeDigitAscii(2, x % 10);}
   if(drawColon == true)
@@ -124,22 +147,26 @@ void writeLeft(byte x)
     x = (x % 10);
     x = (x |= B10000000);
     alpha4.writeDigitAscii(2, x);
-  }
+  }*/
   alpha4.writeDisplay();
 }
 
 
 //This routine writes numbers to the right side of the display------------------------------------------------------
-void writeRight(byte y)
+void writeRight(byte x)
 {
-  alpha4.writeDigitAscii(4, y % 10);
+  char y = (x / 10) + '0';                      //calculate left digit and convert number to character
+  char z = (x % 10) + '0';                      //calculate right digit and convert number to character
+  alpha4.writeDigitAscii(2, y);                 //write the left number
+  alpha4.writeDigitAscii(3, z);                 //write the right number
+  /*alpha4.writeDigitAscii(3, y % 10);
   if(drawColon == false) {alpha4.writeDigitAscii(3, y / 10);}
   if(drawColon == true)
   {
     y = (y / 10);
     y = (y |= B10000000);
-    alpha4.writeDigitAscii(3, y);
-  }
+    alpha4.writeDigitAscii(2, y);
+  }*/
   alpha4.writeDisplay();
 }
 
@@ -167,7 +194,7 @@ void marquee(String s)
 
     // write it out
     alpha4.writeDisplay();
-    delay(200);           //delay between each character transition
+    delay(150);           //delay between each character transition
   }
   alpha4.clear();
   alpha4.writeDisplay();
