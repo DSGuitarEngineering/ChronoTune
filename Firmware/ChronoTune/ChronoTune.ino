@@ -71,6 +71,12 @@ byte warning;                       //temporarily holds the value of the countdo
 
 boolean drawColon = false;          //lights the colon segments on the display when true
 
+
+//***********************************************************************************************************************
+//---------------------------------------------------------SETUP---------------------------------------------------------
+//***********************************************************************************************************************
+
+
 void setup() {
   Serial.begin(9600);     //open the serial port (for debug only)
 
@@ -86,9 +92,57 @@ void setup() {
 }
 
 
+//***********************************************************************************************************************
+//-------------------------------------------------------MAIN LOOP-------------------------------------------------------
+//***********************************************************************************************************************
+
+
 void loop() {
 
 }
+
+
+//***********************************************************************************************************************
+//-------------------------------------------------------SUBROUTINES-----------------------------------------------------
+//***********************************************************************************************************************
+
+
+//This routine writes numbers to the left side of the display--------------------------------------------------------
+void writeLeft(byte x)
+{
+  alpha4.writeDigitAscii(1, x / 10);
+
+  /*if the clock is active and in 12 hour format
+  if((clkHour < 10) && (menu == 0 || menu == B00010000 || menu == B00100000) && (EEPROM.read(2) == 0))
+  {
+    WriteDisp(1, 0x0F);           // turn off the first digit if time is less than 10:00
+  }*/
+
+  if(drawColon == false) {alpha4.writeDigitAscii(2, x % 10);}
+  if(drawColon == true)
+  {
+    x = (x % 10);
+    x = (x |= B10000000);
+    alpha4.writeDigitAscii(2, x);
+  }
+  alpha4.writeDisplay();
+}
+
+
+//This routine writes numbers to the right side of the display------------------------------------------------------
+void writeRight(byte y)
+{
+  alpha4.writeDigitAscii(4, y % 10);
+  if(drawColon == false) {alpha4.writeDigitAscii(3, y / 10);}
+  if(drawColon == true)
+  {
+    y = (y / 10);
+    y = (y |= B10000000);
+    alpha4.writeDigitAscii(3, y);
+  }
+  alpha4.writeDisplay();
+}
+
 
 //This routine displays marquee style messages--------------------------------------------------------------
 //  must pass a string; returns nothing
