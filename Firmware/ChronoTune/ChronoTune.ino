@@ -78,7 +78,7 @@ boolean drawColon = false;          //lights the colon segments on the display w
 
 
 void setup() {
-  Serial.begin(9600);     //open the serial port (for debug only)
+  Serial.begin(9600);                                     //open the serial port (for debug only)
 
   //check EEPROM for errors and load default values if errors are found
   if(EEPROM.read(0) > 99) EEPROM.update(0, B00000001);    //initialize countdown timer minutes to 1
@@ -94,10 +94,10 @@ void setup() {
   pinMode (FSW, INPUT_PULLUP);                            //footswitch is NO between pin and ground
   pinMode (SQW, INPUT_PULLUP);                            //RTC SQW pin is open drain; requires pullup
 
-  alpha4.begin(0x70);     //display driver is at I2C address 70h
+  alpha4.begin(0x70);                                     //display driver is at I2C address 70h
 
-  alpha4.clear();         //clear the display
-  alpha4.writeDisplay();  //update the display with new data
+  alpha4.clear();                                         //clear the display
+  alpha4.writeDisplay();                                  //update the display with new data
 
   //display startup message
   marquee("ChronoTune");
@@ -149,13 +149,13 @@ void writeLeft(byte x)
   alpha4.writeDigitAscii(0, y);                 //write the left number
   alpha4.writeDigitAscii(1, z);                 //write the right number
 
-  /*if the clock is active and in 12 hour format
+  //if the clock is active and in 12 hour format
   if((clkHour < 10) && (menu == 0 || menu == B00010000 || menu == B00100000) && (EEPROM.read(2) == 0))
   {
-    WriteDisp(1, 0x0F);           // turn off the first digit if time is less than 10:00
+    alpha4.writeDigitAscii(0, ' ');             // turn off the first digit if time is less than 10:00
   }
 
-  if(drawColon == false) {alpha4.writeDigitAscii(2, x % 10);}
+  /*if(drawColon == false) {alpha4.writeDigitAscii(2, x % 10);}
   if(drawColon == true)
   {
     x = (x % 10);
