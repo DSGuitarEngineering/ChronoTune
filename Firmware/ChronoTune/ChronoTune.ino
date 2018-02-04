@@ -32,7 +32,7 @@ Project ChronoTune was developed in collaboration with the Inner Circle of the 6
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
-#include <FlashStorage.h>
+#include <FlashAsEEPROM.h>
 #include "RTClib.h"
 
 //hardware setup
@@ -80,6 +80,15 @@ boolean drawColon = false;          //lights the colon segments on the display w
 void setup() {
   Serial.begin(9600);     //open the serial port (for debug only)
 
+  //check EEPROM for errors and load default values if errors are found
+  if(EEPROM.read(0) > 99) EEPROM.update(0, B00000001);    //initialize countdown timer minutes to 1
+  if(EEPROM.read(1) > 59) EEPROM.update(1, B00000000);    //initialize countdown timer seconds to 0
+  if(EEPROM.read(2) > 1)  EEPROM.update(2, B00000000);    //initialize clock hour format to "12hr"
+      //0 = 12hr, 1 = 24hr
+  if(EEPROM.read(3) > 1)  EEPROM.update(3, B00000000);    //initialize countdown timer warning to "on"
+      //0 = on, 1 = off
+  if(EEPROM.read(4) > 10) EEPROM.update(4, B00000001);    //initialize warning time to 1min
+
   alpha4.begin(0x70);     //display driver is at I2C address 70h
 
   alpha4.clear();         //clear the display
@@ -98,8 +107,8 @@ void setup() {
 
 
 void loop() {
-  blinkLeft(12);
-  blinkRight(34);
+  blinkLeft(EEPROM.read(0));
+  blinkRight(EEPROM.read(1));
   alpha4.blinkRate(0);
   delay(250);
 }
