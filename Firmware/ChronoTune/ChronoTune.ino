@@ -107,8 +107,7 @@ void setup() {
 
 
 void loop() {
-  blinkLeft(EEPROM.read(0));
-  blinkRight(EEPROM.read(1));
+  writeClk();
   alpha4.blinkRate(0);
   delay(250);
 }
@@ -124,11 +123,11 @@ void writeClk()
 {
   DateTime now = rtc.now();                     // Get the RTC info
   clkHour = now.hour();                         // Get the hour
-  /*if(EEPROM.read(2) == 0)
+  if(EEPROM.read(2) == 0)
   {
     if(clkHour > 12) clkHour -= 12;             // if 12hr format is selected, convert the hours
     if(clkHour == 0) clkHour = 12;
-  }*/
+  }
   clkMin = now.minute();                        // Get the minutes
   drawColon = true;
   //WriteDisp(0x09, 0x0F);                        // Set all digits to "BCD decode".
