@@ -36,7 +36,7 @@ Project ChronoTune was developed in collaboration with the Inner Circle of the 6
 #include "RTClib.h"
 
 //hardware setup
-RTC_DS3231 rtc;                                    //declare the DS3231 RTC
+RTC_DS3231 rtc;                                    //declare the RTC, actual RTC is DS3232
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();  //declare the display
 
 //set pin numbers
@@ -88,6 +88,11 @@ void setup() {
   if(EEPROM.read(3) > 1)  EEPROM.update(3, B00000000);    //initialize countdown timer warning to "on"
       //0 = on, 1 = off
   if(EEPROM.read(4) > 10) EEPROM.update(4, B00000001);    //initialize warning time to 1min
+  EEPROM.commit();
+
+  //setup I/O pin modes
+  pinMode (FSW, INPUT_PULLUP);                            //footswitch is NO between pin and ground
+  pinMode (SQW, INPUT_PULLUP);                            //RTC SQW pin is open drain; requires pullup
 
   alpha4.begin(0x70);     //display driver is at I2C address 70h
 
