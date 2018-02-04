@@ -125,7 +125,7 @@ void setup() {
 
 void loop() {
   writeClk();
-  digitalWrite(CLN, !digitalRead(CLN));
+  drawColon(true);
   alpha4.blinkRate(0);
   delay(250);
 }
@@ -259,6 +259,14 @@ void blinkRight(byte x)
   alpha4.writeDisplay();
   delay(500);
   writeRight(x);
+}
+
+
+//This routine turns the colon LEDs on or off---------------------------------------------------------------------------
+void drawColon(boolean x)
+{
+  if (x == true) digitalWrite(CLN, HIGH);
+  if (x == false) digitalWrite(CLN, LOW);
 }
 
 
