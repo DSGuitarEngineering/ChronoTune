@@ -99,6 +99,7 @@ void setup() {
 
 void loop() {
   blinkLeft(12);
+  blinkRight(34);
   alpha4.blinkRate(0);
   delay(250);
 }
@@ -215,8 +216,9 @@ void blinkLeft(byte x)
 //This routine blinks the right side of the display--------------------------------------------------------------------
 void blinkRight(byte x)
 {
-  //WriteDisp(3,0x0F);
-  //WriteDisp(4,0x0F);
+  alpha4.writeDigitAscii(2, ' ');
+  alpha4.writeDigitAscii(3, ' ');
+  alpha4.writeDisplay();
   delay(500);
   writeRight(x);
 }
