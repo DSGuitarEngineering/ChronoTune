@@ -98,7 +98,8 @@ void setup() {
 
 
 void loop() {
-  writeClk();
+  blinkLeft(12);
+  alpha4.blinkRate(0);
   delay(250);
 }
 
@@ -197,4 +198,25 @@ void marquee(String s)
   }
   alpha4.clear();
   alpha4.writeDisplay();
+}
+
+
+//This routine blinks the left side of the display--------------------------------------------------------------------
+void blinkLeft(byte x)
+{
+  alpha4.writeDigitAscii(0, ' ');
+  alpha4.writeDigitAscii(1, ' ');
+  alpha4.writeDisplay();
+  delay(500);
+  writeLeft(x);
+}
+
+
+//This routine blinks the right side of the display--------------------------------------------------------------------
+void blinkRight(byte x)
+{
+  //WriteDisp(3,0x0F);
+  //WriteDisp(4,0x0F);
+  delay(500);
+  writeRight(x);
 }
