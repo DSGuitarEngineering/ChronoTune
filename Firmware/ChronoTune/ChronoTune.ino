@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Version:        0.1.0
-Modified:       February 3, 2018
-Verified:       February 3, 2018
+Modified:       February 4, 2018
+Verified:       February 4, 2018
 Target uC:      ATSAMD21G18
 
 -----------------------------------------***DESCRIPTION***------------------------------------------------
@@ -40,8 +40,9 @@ RTC_DS3231 rtc;                                    //declare the RTC, actual RTC
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();  //declare the display
 
 //set pin numbers
-const byte FSW = 1;                 //footswitch pin, active low
+const byte FSW = 2;                 //footswitch pin, active low
 const byte SQW = 4;                 //RTC square wave input pin
+const byte CLN = 13;                //colon LEDs, active high
 
 //declare variables
 char displaybuffer[4] = {' ', ' ', ' ', ' '};      //buffer for marquee messages
@@ -69,7 +70,7 @@ byte menu = 0;                      //menu register stores the current position 
 boolean setupMode = false;          //specifies whether startup should go to setup mode or normal
 byte warning;                       //temporarily holds the value of the countdown timer warning
 
-boolean drawColon = false;          //lights the colon segments on the display when true
+//boolean drawColon = false;          //lights the colon segments on the display when true
 
 
 //***********************************************************************************************************************
@@ -94,6 +95,9 @@ void setup() {
   pinMode (FSW, INPUT_PULLUP);                            //footswitch is NO between pin and ground
   pinMode (SQW, INPUT_PULLUP);                            //RTC SQW pin is open drain; requires pullup
 
+  pinMode (CLN, OUTPUT);                                  //colon LEDs, active high
+  digitalWrite(CLN, LOW);                                 //initialize colon off
+
   alpha4.begin(0x70);                                     //display driver is at I2C address 70h
 
   alpha4.clear();                                         //clear the display
@@ -108,7 +112,7 @@ void setup() {
     marquee("ChronoTune");
     //delay(500);
     //marquee("by DS Engineering");
-    
+
     writeClk();
   }
 }
@@ -121,6 +125,7 @@ void setup() {
 
 void loop() {
   writeClk();
+  digitalWrite(CLN, !digitalRead(CLN));
   alpha4.blinkRate(0);
   delay(250);
 }
@@ -142,7 +147,7 @@ void writeClk()
     if(clkHour == 0) clkHour = 12;
   }
   clkMin = now.minute();                        // Get the minutes
-  drawColon = true;
+  //drawColon = true;
   //WriteDisp(0x09, 0x0F);                        // Set all digits to "BCD decode".
   writeLeft(clkHour);
   writeRight(clkMin);
