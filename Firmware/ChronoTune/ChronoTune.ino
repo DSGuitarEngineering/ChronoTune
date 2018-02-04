@@ -148,10 +148,104 @@ void setup() {
 //***********************************************************************************************************************
 
 
-void loop() {
-  writeClk();
-  alpha4.blinkRate(0);
-  delay(250);
+void loop()
+{
+  //check for a valid button press transition
+  if ((millis() - buttonTimer >= debounce) && !buttonDown && (digitalRead(FSW) == LOW))
+  //if it has been longer than the debounce interval and the previous reading was "up"
+  //and the current reading is "down"
+  {
+    buttonDown = true;                        //record a valid press
+    buttonTimer = millis();                   //restart the debounce timer
+  }
+
+  //check for a valid button release transition
+  if ((millis() - buttonTimer >= debounce) && buttonDown && (digitalRead(FSW) == HIGH))
+  //if it has been longer than the debounce interval and the previous reading was "down"
+  //and the current reading is "up"
+  {
+    buttonDown = false;                      //record a valid release
+    buttonTimer = millis();                  //restart the debounce timer
+
+    //when a valid release is detected:
+
+    if (buttonHeld == true)                  //if the release occurs after a button is held
+      {
+        buttonHeld = false;                  //reset the buttonHeld variable
+        goto bailout;                        //skip the tapHandler sequence
+      }
+
+    tapHandler();                            //go to the tap menu tree
+  }
+
+//bailout from tapHandler
+bailout:
+
+  //call hold functions if footswitches are held for 1 second or longer
+  if ((buttonDown == true) && (millis() - buttonTimer >= 1000) && (buttonHeld == false))
+    {
+      buttonHeld = true;                            //record a button hold
+      holdHandler();                                //go to the hold menu tree
+    }
+
+  //check the state of the RTC 1Hz square wave***********************************************************************************************************
+  SQWstate = digitalRead(SQW);
+  delay(50);
+
+  //if the countdown timer is active and it has been 1 second or more
+  if ((runTimer == true) && (SQWstate == 1) && (digitalRead(SQW) == 0))
+  {
+    ctdnSec = --ctdnSec;                            //decrement the countdown timer seconds
+    //change seconds to "59" when value falls below zero
+    if(ctdnSec == 255) {ctdnSec = 59; ctdnMin = --ctdnMin;}
+    //refresh the display if the countdown timer is still running
+    if((ctdnSec >= 0) && (ctdnMin >= 0)) {writeLeft(ctdnMin); writeRight(ctdnSec);}
+    if(ctdnMin < warning) alpha4.blinkRate(2);           //blink display if the threshold has been crossed
+    //if the countdown timer has expired
+    if((ctdnSec == 0) && (ctdnMin == 0))
+    {
+      runTimer = false;                             //diable the countdown timer
+      menu = B00000001;
+    }
+
+  }
+
+  //if the stopwatch is active and it has been 1 second or more
+  if ((runSW == true) && (SQWstate == 1) && (digitalRead(SQW) == 0))
+  {
+    swSec = ++swSec;                                //increment the stopwatch seconds
+    if(swSec > 59) {swSec = 0; swMin = ++swMin;}    //change the seconds to zero if the value passes 59
+    if(swMin > 59) {swMin = 0; swHrs = ++swHrs;}    //change the minutes to zero if the value passes 59
+    if(swHrs == 0)
+    {
+      writeLeft(swMin);                             //refresh the display
+      writeRight(swSec);                            //"
+    }
+    if(swHrs > 0)
+    {
+      //drawColon = !drawColon;                       //toggle the colon every second if an hour has passed
+      writeLeft(swHrs);                             //refresh the display
+      writeRight(swMin);                            //"
+    }
+    if(swHrs == 99)                                 //if the stopwatch reaches 99 hours
+    {
+      runSW = false;                                //disable the stopwatch
+      swSec = 0;                                    //reset the stopwatch seconds value
+      swMin = 0;                                    //reset the stopwatch minutes value
+      swHrs = 0;                                    //reset the stopwatch hours value
+      menu = B00001010;
+    }
+  }
+
+  //if the clock is selected, update the current time
+  if (menu == 0)
+    {
+      DateTime now = rtc.now();                     //get the RTC info
+      if (clkMin != now.minute())                   //if the minute has changed
+      {
+        writeClk();                                 //update the clock
+      }
+    }
 }
 
 
