@@ -160,6 +160,293 @@ void loop() {
 //***********************************************************************************************************************
 
 
+//This routine handles footswitch taps
+void tapHandler()
+{
+  switch (menu) {
+    //NORMAL MENU---------------------------------------------------
+    case B00000001:
+      //countdown timer root
+        //select countdown timer
+        ctdnMin = EEPROM.read(0);                               //load the countdown timer minute from memory
+        ctdnSec = EEPROM.read(1);                               //load the countdown timer seconds from memory
+        drawColon(true);                                        //enable the colon
+        //WriteDisp(0x09, 0x0F);                                  //decode all 4 digits
+        writeLeft(ctdnMin);                                     //write the minutes to the left side
+        writeRight(ctdnSec);                                    //write the seconds to the right side
+        delay(500);
+        blinkLeft(ctdnMin);                                     //blink the minutes
+        menu = B00000010;
+      break;
+    case B00000010:
+      //select countdown timer
+        //increment timer minutes
+        ctdnMin = ++ctdnMin;                                    //increment the countdown timer minutes
+        if(ctdnMin > 99) {ctdnMin = 0;}                         //if the minutes value passes 99, make it 0
+        writeLeft(ctdnMin);                                     //write the minutes to the display
+        menu = B00000010;
+      break;
+    case B00000100:
+      //increment timer seconds
+        //increment timer seconds
+        ctdnSec = ++ctdnSec;                                    //increment the countdown timer seconds
+        if(ctdnSec > 59) {ctdnMin = ++ctdnMin; ctdnSec = 0;}    //if the seconds pass 59, make it zero and
+                                                                //  increment minutes
+        if(ctdnMin > 99) {ctdnMin = 0;}                         //if the minutes value passes 99, make it 0
+        writeLeft(ctdnMin);                                     //write the minutes to the left side
+        writeRight(ctdnSec);                                    //write the seconds to the right side
+        menu = B00000100;
+      break;
+    case B00000111:
+      //Timer Start
+        //pause timer
+        runTimer = !runTimer;                                   //toggle the variable to pause/resume the timer
+      break;
+    case B00001010:
+      //Stopwatch Root
+        //select stopwatch and initialize
+        swMin = 0;                                              //set the stopwatch minutes to zero
+        swSec = 0;                                              //set the stopwatch seconds to zero
+        drawColon(true);                                        //enable the colon
+        //WriteDisp(0x09, 0x0F);                                  //decode all 4 digits
+        writeLeft(swMin);                                       //write the minutes to the left side
+        writeRight(swSec);                                      //write the seconds to the right side
+        menu = B00001011;
+      break;
+    case B00001011:
+      //Initialize Stopwatch
+        //start stopwatch
+        runSW = true;                                           //enable the stopwatch
+        menu = B00001100;
+      break;
+    case B00001100:
+      //start Stopwatch
+        //pause/continue stopwatch
+        runSW = !runSW;                                         //toggle the variable to pause/resume the stopwatch
+      break;
+
+
+    //SETUP MENU--------------------------------------------------------------------
+    case B00010000:
+      //setup mode selected
+        //change clock hour
+        clkHour = ++clkHour;                      //increment the clock hour
+        if(EEPROM.read(2) == 0)                   //if the clock is in 12 hour format
+        {
+          if(clkHour > 12) clkHour = 1;           //change the hour to 1 when 12 is passed
+        }
+        if(EEPROM.read(2) >= 1)                   //if the clock is in 24 hour format
+        {
+          if(clkHour > 23) clkHour = 0;           //change the hour to 0 when 23 is passed
+        }
+        writeLeft(clkHour);                       //write the hour value to the left side of the display
+      break;
+    case B00100000:
+      //change clock hour
+        //change clock minute
+        clkMin = ++clkMin;                        //increment the clock minute
+        if(clkMin > 59) clkMin = 0;               //if the clock minute passes 59, make it 0
+        writeRight(clkMin);                       //write the minutes value to the right side of the display
+        //update RTC on hold
+      break;
+    case B00110000:
+      //change clock minute
+        //change clock hour format
+        if(EEPROM.read(2) == 0)                   //if the clock is in 12 hour format
+        {
+          EEPROM.update(2,1);                     //change the format to 24-hour
+          writeRight(24);                         //write "24" to the right side of the display
+          break;
+        }
+        if(EEPROM.read(2) >= 1)                   //if the clock is in 24 hour format
+        {
+          EEPROM.update(2,0);                     //change the format to 12-hour
+          writeRight(12);                         //write "12" to the right side of the display
+        }
+      break;
+    case B01010000:
+      //enable or disable the timer warning
+        //change the warning time
+        warning = ++warning;                      //increment the warning time
+        if(warning > 10) warning = 0;             //roll over to 0 when the value passes 10
+        writeRight(warning);                      //write the warning time to the right side of the display
+      break;
+  }
+}
+
+
+//This routine handles footswitch holds---------------------------------------------------------------------
+void holdHandler()
+{
+  switch (menu) {
+    //NORMAL MENU-------------------------------------------------------
+    case B00000000:
+      //current time
+        //go to countdown timer root
+        drawColon(false);                           //disable the colon
+        marquee("Countdown Timer");
+        char4("CTDN");
+        /*WriteDisp(0x09, 0x00);                    //set all digits to "no decode"
+        writeLeftRaw(0x4E, 0x0F);     //C,t
+        writeRightRaw(0x3D, 0x15);    //d,n*/
+        writeRTC(0x0E, B00000000);                //enable the RTC's SQW output at a frequency of 1Hz****************************************************
+        menu = B00000001;
+      break;
+    case B00000001:
+      //countdown timer root
+        //go to stopwatch root
+        drawColon(false);                         //disable the colon
+        marquee("Stopwatch");
+        char4("CTUP");
+        /*WriteDisp(0x09, 0x00);                    //set all digits to "no decode"
+        writeLeftRaw(0x4E, 0x0F);     //C,t
+        writeRightRaw(0x1C, 0x67);    //u,P*/
+        menu = B00001010;
+      break;
+    case B00000010:
+      //increment timer minutes
+        //accept timer minutes
+        blinkRight(ctdnSec);                      //blink the countdown timer seconds
+        menu = B00000100;
+      break;
+    case B00000011:
+      //accept timer minutes
+        //accept timer seconds
+        EEPROM.update(0, ctdnMin);                //write the countdown timer minutes to memory if different
+        EEPROM.update(1, ctdnSec);                //write the countdown timer seconds to memory if different
+        menu = B00000101;
+      break;
+    case B00000100:
+      //increment timer seconds
+        //accept timer seconds
+        //ClearDisp(500);                           //clear the display and delay for 500 milliseconds
+        alpha4.clear();
+        alpha4.writeDisplay();
+        delay(500);
+        drawColon(true);                          //enable the colon
+        writeLeft(ctdnMin);                       //write the countdown timer minutes to the left side
+        writeRight(ctdnSec);                      //write the countdown timer seconds to the right side
+        EEPROM.update(0, ctdnMin);                //write the countdown timer minutes to memory if different
+        EEPROM.update(1, ctdnSec);                //write the countdown timer seconds to memory if different
+        warning = EEPROM.read(4);                 //read the blink warning time from memory
+        menu = B00000101;
+      break;
+    case B00000101:
+      //accept timer seconds
+        //start timer
+        runTimer = true;                          //enable the countdown timer
+        menu = B00000111;
+      break;
+    case B00000110:
+      //Timer ready
+        //start timer
+        runTimer = true;                          //enable the countdown timer
+        menu = B00000111;
+      break;
+    case B00000111:
+      //Timer Start
+        //stop and clear timer
+        runTimer = false;                         //disable the countdown timer
+        ctdnMin = EEPROM.read(0);                 //load the countdown timer minutes from memory
+        ctdnSec = EEPROM.read(1);                 //load the countdown timer seconds from memory
+        writeLeft(ctdnMin);                       //write the minutes to the left side of the display
+        writeRight(ctdnSec);                      //write the seconds to the right side of the display
+        menu = B00000001;
+      break;
+    case B00001000:
+      //Timer Pause
+        //stop and clear timer
+        runTimer = false;                         //disable the countdown timer
+        ctdnMin = EEPROM.read(0);                 //load the countdown timer minutes from memory
+        ctdnSec = EEPROM.read(1);                 //load the countdown timer seconds from memory
+        writeLeft(ctdnMin);                       //write the minutes to the left side of the display
+        writeRight(ctdnSec);                      //write the seconds to the right side of the display
+        menu = B00000001;
+      break;
+    case B00001010:
+      //Timer Stop/Reset
+        //go to clock
+        /*ClearDisp(50);                            //clear the display and delay for 50 milliseconds
+        drawColon = true;*/                         //enable the colon
+        alpha4.clear();
+        alpha4.writeDisplay();
+        delay(50);
+        menu = B00000000;
+        writeClk();                               //write the current time to the display
+        writeRTC(0x07, B00000100);                //disable the RTC's SQW output******************************************************************************
+      break;
+    case B00001011:
+      //stopwatch Stop/Reset
+        //go to clock
+        /*ClearDisp(50);                            //clear the display and delay for 50 milliseconds
+        drawColon = true;*/                         //enable the colon
+        alpha4.clear();
+        alpha4.writeDisplay();
+        delay(50);
+        menu = B00000000;
+        writeClk();                               //write the current time to the display
+        writeRTC(0x07, B00000100);                //disable the RTC's SQW output******************************************************************************
+      break;
+    case B00001100:
+      //stopwatch start
+        //stopwatch stop/reset
+        swMin = 0;                                //reset the stopwatch minutes
+        swSec = 0;                                //reset the stopwatch seconds
+        writeLeft(swMin);                         //write the minutes to the left side of the display
+        writeRight(swSec);                        //write the seconds to the right side of the display
+        runSW = false;                            //disable the stopwatch
+        menu = B00001011;
+      break;
+
+    //SETUP MENU---------------------------------------------------------------------------
+    case B00010000:
+      //setup mode selected
+        //accept clock hour
+        blinkRight(clkMin);                       //blink the clock minutes
+        menu = B00100000;
+      break;
+    case B00100000:
+      //accept clock hour
+        //accept clock changes
+        //RTC is always operating in 24-hour format.  uC converts to 12-hr format if necessary
+        rtc.adjust(DateTime(2016, 8, 31, clkHour, clkMin, 0));  //write new time to RTC
+        //WriteDisp(0x09, 0x0C);                                  //do not decode left, decode right
+        //writeLeftRaw(0x1F, 0x0E);     //b,L
+        alpha4.writeDigitAscii(0, 'B');
+        alpha4.writeDigitAscii(1, 'L');
+        warning = EEPROM.read(4);
+        writeRight(warning);
+        delay(500);
+        blinkRight(warning);
+        menu = B01010000;
+      break;
+    case B00110000:
+      //accept clock minute
+        //accept clock hour format
+        //update RTC hour format
+
+        //load next menu item
+        writeClk();
+        delay(500);
+        blinkLeft(clkHour);
+        menu = B00010000;
+      break;
+    case B01010000:
+      //accept timer warning status
+        //accept the warning time
+        EEPROM.update(4, warning);
+        //load next menu item
+        //writeLeftRaw(0x17, 0x05);     //h,r
+        alpha4.writeDigitAscii(0, 'H');
+        alpha4.writeDigitAscii(1, 'R');
+        if(EEPROM.read(2) == 0) writeRight(12);
+        if(EEPROM.read(2) >= 1) writeRight(24);
+        menu = B00110000;
+      break;
+  }
+}
+
+
 //This routine writes the current time to the display--------------------------------------------------------------
 void writeClk()
 {
