@@ -222,3 +222,12 @@ void blinkRight(byte x)
   delay(500);
   writeRight(x);
 }
+
+
+//This routine addresses and sends data to the RTC chip (write operation)-----------------------------------------------
+void writeRTC(byte cmd, byte data) {
+  Wire.beginTransmission(0x68);      //7-bit address for DS3231
+  Wire.write(cmd);
+  Wire.write(data);
+  Wire.endTransmission();
+}
