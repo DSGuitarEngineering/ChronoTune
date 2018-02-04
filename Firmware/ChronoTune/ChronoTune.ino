@@ -467,6 +467,7 @@ void holdHandler()
         alpha4.writeDisplay();
         delay(50);
         menu = B00000000;
+        marquee("Clock");
         writeClk();                               //write the current time to the display
         writeRTC(0x07, B00000100);                //disable the RTC's SQW output******************************************************************************
       break;
@@ -479,6 +480,7 @@ void holdHandler()
         alpha4.writeDisplay();
         delay(50);
         menu = B00000000;
+        marquee("Clock");
         writeClk();                               //write the current time to the display
         writeRTC(0x07, B00000100);                //disable the RTC's SQW output******************************************************************************
       break;
