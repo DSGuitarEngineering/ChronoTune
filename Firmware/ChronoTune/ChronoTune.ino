@@ -99,10 +99,18 @@ void setup() {
   alpha4.clear();                                         //clear the display
   alpha4.writeDisplay();                                  //update the display with new data
 
-  //display startup message
-  marquee("ChronoTune");
-  //delay(500);
-  //marquee("by DS Engineering");
+  //if the setup mode was not initiated boot in normal mode
+  if(setupMode == false)
+  {
+    //display startup message
+    char4("DSGE");
+    delay(1000);
+    marquee("ChronoTune");
+    //delay(500);
+    //marquee("by DS Engineering");
+    
+    writeClk();
+  }
 }
 
 
@@ -211,6 +219,18 @@ void marquee(String s)
     delay(150);           //delay between each character transition
   }
   alpha4.clear();
+  alpha4.writeDisplay();
+}
+
+
+//This routine displays static 4-character messages-------------------------------------------------------------------
+//  must pass a string; returns nothing
+void char4(String s)
+{
+  alpha4.writeDigitAscii(0, s.charAt(0));
+  alpha4.writeDigitAscii(1, s.charAt(1));
+  alpha4.writeDigitAscii(2, s.charAt(2));
+  alpha4.writeDigitAscii(3, s.charAt(3));
   alpha4.writeDisplay();
 }
 
