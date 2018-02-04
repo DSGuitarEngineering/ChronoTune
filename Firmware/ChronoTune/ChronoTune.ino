@@ -103,6 +103,31 @@ void setup() {
   alpha4.clear();                                         //clear the display
   alpha4.writeDisplay();                                  //update the display with new data
 
+
+  //if the footswitch is held down, start in setup mode
+    if(digitalRead(FSW) == LOW)
+    {
+      marquee("SETUP MODE");
+      //writeLeftRaw(0x5B, 0x0F);     //S,t
+      //writeRightRaw(0x1C, 0x67);    //u,P
+      delay(1000);
+      setupMode = true;
+      //load the first menu item
+      marquee("Warning Threshold");
+      //WriteDisp(0x09, 0x0C);                                // do not decode left, decode right
+      //writeLeftRaw(0x1F, 0x0E);     //b,L
+      alpha4.writeDigitAscii(0, 'B');
+      alpha4.writeDigitAscii(1, 'L');
+      drawColon(true);
+      warning = EEPROM.read(4);
+      writeRight(warning);
+      delay(500);
+      blinkRight(warning);
+      //set the next menu item
+      menu = B01010000;
+    }
+
+
   //if the setup mode was not initiated boot in normal mode
   if(setupMode == false)
   {
@@ -125,7 +150,6 @@ void setup() {
 
 void loop() {
   writeClk();
-  drawColon(true);
   alpha4.blinkRate(0);
   delay(250);
 }
@@ -147,10 +171,10 @@ void writeClk()
     if(clkHour == 0) clkHour = 12;
   }
   clkMin = now.minute();                        // Get the minutes
-  //drawColon = true;
+  drawColon(true);                              //turn on the colon
   //WriteDisp(0x09, 0x0F);                        // Set all digits to "BCD decode".
-  writeLeft(clkHour);
-  writeRight(clkMin);
+  writeLeft(clkHour);                           //push the hours value to the display
+  writeRight(clkMin);                           //push the minutes value to the display
 }
 
 
