@@ -200,10 +200,11 @@ bailout:
     if(ctdnSec == 255) {ctdnSec = 59; ctdnMin = --ctdnMin;}
     //refresh the display if the countdown timer is still running
     if((ctdnSec >= 0) && (ctdnMin >= 0)) {writeLeft(ctdnMin); writeRight(ctdnSec);}
-    if(ctdnMin < warning) alpha4.blinkRate(2);           //blink display if the threshold has been crossed
+    if((ctdnMin == warning) && (ctdnSec == 0)) alpha4.blinkRate(2);    //flash display if the threshold has been crossed
     //if the countdown timer has expired
     if((ctdnSec == 0) && (ctdnMin == 0))
     {
+      alpha4.blinkRate(0);                          //disable the warning flash
       runTimer = false;                             //diable the countdown timer
       menu = B00000001;
     }
