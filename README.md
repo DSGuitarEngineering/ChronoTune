@@ -7,7 +7,7 @@ Please initiate contact through our [official website](https://ds.engineering/co
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/DSGuitarEngineering/Chronograph/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/DSGuitarEngineering/ChronoTune/tags).
 
 ## Authors
 
