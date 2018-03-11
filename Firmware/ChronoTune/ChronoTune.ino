@@ -60,6 +60,8 @@ void setup() {
   marquee("Project ChronoTune");
   delay(500);
   marquee("by DS Engineering");
+
+  inTune();
 }
 
 
@@ -94,4 +96,43 @@ void marquee(String s)
   }
   alpha4.clear();
   alpha4.writeDisplay();
+}
+
+//This routine clears the Neopixel strip------------------------------------------------------------------
+// no dependencies, returns nothing
+void clearStrip()
+{
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, 0);
+    }
+  strip.show();
+}
+
+
+//This routine displays the "in tune" animation on the Neopixel strip---------------------------------------
+// no dependencies, returns nothing
+void inTune()
+{
+  uint32_t c = strip.Color(0, 64, 0);  //low brightness green
+  uint8_t wait = 50;
+  strip.setPixelColor(3, c);
+  strip.setPixelColor(4, c);
+  strip.show();
+  delay(wait);
+  clearStrip();
+  strip.setPixelColor(2, c);
+  strip.setPixelColor(5, c);
+  strip.show();
+  delay(wait);
+  clearStrip();
+  strip.setPixelColor(1, c);
+  strip.setPixelColor(6, c);
+  strip.show();
+  delay(wait);
+  clearStrip();
+  strip.setPixelColor(0, c);
+  strip.setPixelColor(7, c);
+  strip.show();
+  delay(wait);
+  clearStrip();
 }
