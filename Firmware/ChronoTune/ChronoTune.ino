@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Version:        0.0.1
-Modified:       January 27, 2018
-Verified:       January 27, 2018
+Version:        0.2.0
+Modified:       March 10, 2018
+Verified:       March 10, 2018
 Target uC:      ATSAMD21G18
 
 -----------------------------------------***DESCRIPTION***------------------------------------------------
@@ -32,8 +32,16 @@ Project ChronoTune was developed in collaboration with the Inner Circle of the 6
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+  #include <avr/power.h>
+#endif
 
-Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();  //initialize the display
+#define PIN 6  //Neopixel pin
+
+//initialize the Neopixel strip and the alphanumeric display
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(8, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 
 char displaybuffer[4] = {' ', ' ', ' ', ' '};  //buffer for marquee messages
 
@@ -44,6 +52,9 @@ void setup() {
 
   alpha4.clear();         //clear the display
   alpha4.writeDisplay();  //use this command to update the display
+
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
 
   //display startup message
   marquee("Project ChronoTune");
