@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Version:        0.2.0
-Modified:       March 10, 2018
-Verified:       March 10, 2018
+Modified:       March 12, 2018
+Verified:       March 12, 2018
 Target uC:      ATSAMD21G18
 
 -----------------------------------------***DESCRIPTION***------------------------------------------------
@@ -45,6 +45,45 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 
 char displaybuffer[4] = {' ', ' ', ' ', ' '};  //buffer for marquee messages
 
+/*****************************************************************************
+                          DECLARATIONS FROM TUNER CODE
+******************************************************************************/
+
+#define N 200 //Buffer Size
+#define sampleF 38500//Hz
+#define display_time 5000//ms
+
+
+byte incomingAudio, bIndex=N-1;
+int buffer[N];
+long int corr[N], corrMin;
+long int t_old, t_new = millis();
+int i, j, minIndex,s;
+int Freq=0;
+boolean clipping = 0, flag = 0;
+
+
+const int A  = 110,             //These are the standard note frequencies
+      As = 116,                 //At the lowest octave
+      B  = 123,
+      C  = 131,
+      Cs = 139,
+      D  = 147,
+      Ds = 156,
+      E  = 165,
+      F  = 171,
+      Fs = 185,
+      G  = 196,
+      Gs = 208;
+int note = A;
+int deviation = 0;
+bool dev;               //Higher or lower from the correct note
+bool correct;   //To show that the guitar is in tune
+
+
+/*****************************************************************************
+                                  SETUP
+******************************************************************************/
 void setup() {
   Serial.begin(9600);  //open the serial port (for debug only)
 
@@ -57,12 +96,14 @@ void setup() {
   strip.show(); // Initialize all pixels to 'off'
 
   //display startup message
-  //marquee("ChronoTune");
-  //delay(300);
-  //marquee("by DS Engineering");
+  marquee("ChronoTune");
+  delay(300);
+  marquee("by DS Engineering");
 }
 
-
+/*****************************************************************************
+                                MAIN LOOP
+******************************************************************************/
 void loop()
 {
   alpha4.writeDigitAscii(1, 'A');
