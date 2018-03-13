@@ -57,16 +57,24 @@ void setup() {
   strip.show(); // Initialize all pixels to 'off'
 
   //display startup message
-  marquee("Project ChronoTune");
-  delay(500);
-  marquee("by DS Engineering");
-
-  inTune();
+  //marquee("ChronoTune");
+  //delay(300);
+  //marquee("by DS Engineering");
 }
 
 
-void loop() {
-
+void loop()
+{
+  alpha4.writeDigitAscii(1, 'A');
+  alpha4.writeDisplay();
+  delay(100);
+  inTune();
+  delay(1000);
+  alpha4.clear();
+  alpha4.writeDisplay();
+  clearStrip();
+  strip.show();
+  delay(1500);
 }
 
 //This routine displays marquee style messages--------------------------------------------------------------
@@ -92,7 +100,7 @@ void marquee(String s)
 
     // write it out
     alpha4.writeDisplay();
-    delay(200);           //delay between each character transition
+    delay(150);           //delay between each character transition
   }
   alpha4.clear();
   alpha4.writeDisplay();
@@ -120,19 +128,24 @@ void inTune()
   strip.show();
   delay(wait);
   clearStrip();
+  strip.setPixelColor(3, c);  strip.setPixelColor(4, c);
   strip.setPixelColor(2, c);
   strip.setPixelColor(5, c);
   strip.show();
   delay(wait);
   clearStrip();
+  strip.setPixelColor(3, c);  strip.setPixelColor(4, c);
   strip.setPixelColor(1, c);
   strip.setPixelColor(6, c);
   strip.show();
   delay(wait);
   clearStrip();
+  strip.setPixelColor(3, c);  strip.setPixelColor(4, c);
   strip.setPixelColor(0, c);
   strip.setPixelColor(7, c);
   strip.show();
   delay(wait);
   clearStrip();
+  strip.setPixelColor(3, c);  strip.setPixelColor(4, c);
+  strip.show();
 }
