@@ -190,3 +190,27 @@ void inTune()
   strip.setPixelColor(3, c);  strip.setPixelColor(4, c);
   strip.show();
 }
+
+/*****************************************************************************
+                FUNCTION TO COMPUTE FUNDAMENTAL FREQUENCY
+******************************************************************************/
+
+void compute(void){
+  //Autocorrelate and find minimum point
+  minIndex=0;
+  for(i=0; i<=N-1; i++){
+    corr[i] = 0;
+    for(j=0; j<=N-1; j++){
+      s = j+i;
+      if((j+i)>(N-1))
+          s = (j+i) - (N-1);
+      corr[i] = corr[i] + (int)buffer[j]*buffer[s];
+    }
+      if(corr[i]<corr[minIndex])
+        minIndex = i;
+
+  }
+
+  //Calculate Frequency
+  Freq = sampleF/(minIndex*2);
+}
