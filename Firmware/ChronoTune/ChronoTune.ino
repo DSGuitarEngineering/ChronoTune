@@ -214,3 +214,106 @@ void compute(void){
   //Calculate Frequency
   Freq = sampleF/(minIndex*2);
 }
+
+/*****************************************************************************
+                        PITCH DETECTION FUNCTION
+******************************************************************************/
+
+void pitch(void){
+        /*
+        This function is used to find the pitch after finding frequency and display the
+        outputs on the 7 segment display and the LEDs
+        */
+
+        const float t = 0.035; //tolerance band for note
+        const float t2 = 0.01; //tolerance band for correct note
+        int octave = 1;
+
+        //FIND OCTAVE
+        if(Freq > Gs*1)
+                octave = 2;
+        if(Freq > Gs*2)
+                octave =4;
+        if(Freq > Gs*4)
+                octave = 8;
+
+        /*FIND PITCH
+          The following portion is equivalent to checking if 'Freq'
+          lies within a certain band around the given note.
+          The width of this band is set by 't' (a percentage value)
+          Check if:
+               (input_note) lies within required_note +/- (percentage*required_note)
+        */
+
+          if( Freq > (A*octave)*(1-t) && Freq < (A*octave)*(1+t) ){
+                note = A;
+                //Signal the 7 seg display with the letter in each of these if statements.
+                //seven_seg_A();
+                }
+          else  if( Freq > (As*octave)*(1-t) && Freq < (As*octave)*(1+t) ){
+                note = As;
+                //seven_seg_As();
+                }
+          else  if( Freq > (B*octave)*(1-t) && Freq < (B*octave)*(1+t) ){
+                note = B;
+                //seven_seg_B();
+                }
+          else  if( Freq > (C*octave)*(1-t) && Freq < (C*octave)*(1+t) ){
+                note = C;
+                //seven_seg_C();
+                }
+          else  if( Freq > (Cs*octave)*(1-t) && Freq < (Cs*octave)*(1+t) ){
+                note = Cs;
+                //seven_seg_Cs();
+                }
+          else  if( Freq > (D*octave)*(1-t) && Freq < (D*octave)*(1+t) ){
+                note = D;
+                //seven_seg_D();
+                }
+          else  if( Freq > (Ds*octave)*(1-t) && Freq < (Ds*octave)*(1+t) ){
+                note = Ds;
+                //seven_seg_Ds();
+                }
+          else  if( Freq > (E*octave)*(1-t) && Freq < (E*octave)*(1+t) ){
+                note = E;
+                //seven_seg_E();
+                }
+          else  if( Freq > (F*octave)*(1-t) && Freq < (F*octave)*(1+t) ){
+                note = F;
+                //seven_seg_F();
+                }
+          else  if( Freq > (Fs*octave)*(1-t) && Freq < (Fs*octave)*(1+t) ){
+                note = Fs;
+                //seven_seg_Fs();
+                }
+          else  if( Freq > (G*octave)*(1-t) && Freq < (G*octave)*(1+t) ){
+                note = G;
+                //seven_seg_G();
+                }
+          else  if( Freq > (Gs*octave)*(1-t) && Freq < (Gs*octave)*(1+t) ){
+                note = Gs;
+                //seven_seg_Gs();
+                }
+
+          //DISPLAY
+          deviation = Freq - note*octave;
+          if (abs(deviation) < t2*note){
+                 correct = 1;      //in tune
+                 //Serial.print(" ");
+                 //Serial.println("Correct");
+                 }
+          else{
+                correct = 0;      //not in tune
+                if((deviation)>0){
+                  //Serial.print(" ");
+                  //Serial.println("Note = deviated HIGH");
+                  dev = HIGH;
+                }
+                else {
+                        // Serial.print(" ");
+                        //Serial.println("Deviated Low");
+                        dev = LOW;
+                }
+        }
+}
+/***************END OF PITCH DETECTION FUNCTION****************/
