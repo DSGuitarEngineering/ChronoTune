@@ -64,7 +64,7 @@ boolean clipping = 0, flag = 0;
 
 
 const int A  = 110,             //These are the standard note frequencies
-      As = 116,                 //At the lowest octave
+      As = 116,                 //at the lowest octave
       B  = 123,
       C  = 131,
       Cs = 139,
@@ -85,6 +85,27 @@ bool correct;   //To show that the guitar is in tune
                                   SETUP
 ******************************************************************************/
 void setup() {
+
+  //ADC SETUP
+  noInterrupts();    //disable interrupts
+ 
+  //set up continuous sampling of analog pin 0
+  //ADCSRA = 0;                    //clear ADCSRA and ADCSRB registers
+  ADC->CTRLA.reg = 0;
+  //ADCSRB = 0;
+  ADC->CTRLB.reg = 0;
+  //ADMUX |= (1 << REFS0);   //set reference voltage to AVcc with external capacitor at AREF pin
+  //ADMUX |= (1 << ADLAR);   //left align the ADC value- so we can read highest 8 bits from ADCH register only
+  //ADCSRA |= (1 << ADPS2) | (1 << ADPS0);        //set ADC clock with 32 prescaler- 16mHz/32=500kHz
+  //ADCSRA |= (1 << ADATE);     //enabble auto trigger (freerun mode already set with ADCSRB = 0)
+  //ADCSRA |= (1 << ADIE);      //enable interrupts when measurement complete
+  //ADCSRA |= (1 << ADEN);      //enable ADC
+  ADC->CTRLA.bit.ENABLE = 1;
+  //ADCSRA |= (1 << ADSC);      //start ADC measurements
+    
+  interrupts();    //enable interrupts
+  //end of ADC Setup
+  
   Serial.begin(9600);  //open the serial port (for debug only)
 
   alpha4.begin(0x70);  // pass in the address
