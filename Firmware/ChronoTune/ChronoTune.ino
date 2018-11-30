@@ -96,12 +96,17 @@ void setup() {
   ADC->CTRLB.reg = 0;
   //ADMUX |= (1 << REFS0);   //set reference voltage to AVcc with external capacitor at AREF pin
   //ADMUX |= (1 << ADLAR);   //left align the ADC value- so we can read highest 8 bits from ADCH register only
+  ADC->CTRLB.bit.LEFTADJ = 1;
   //ADCSRA |= (1 << ADPS2) | (1 << ADPS0);        //set ADC clock with 32 prescaler- 16mHz/32=500kHz
+  //ADC->CTRLB.bit.PRESCALER = 0;  //ADC prescaler=4  1MHz/4=250kHz
   //ADCSRA |= (1 << ADATE);     //enabble auto trigger (freerun mode already set with ADCSRB = 0)
+  ADC->CTRLB.bit.FREERUN = 1;
   //ADCSRA |= (1 << ADIE);      //enable interrupts when measurement complete
+  ADC->INTENSET.bit.RESRDY = 1;
   //ADCSRA |= (1 << ADEN);      //enable ADC
   ADC->CTRLA.bit.ENABLE = 1;
   //ADCSRA |= (1 << ADSC);      //start ADC measurements
+  ADC->SWTRIG.bit.START = 1;
     
   interrupts();    //enable interrupts
   //end of ADC Setup
